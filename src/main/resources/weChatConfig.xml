@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wx-req>
+	<!-- 获取access_token -->
+	<req key="access_token" method="get" datatype="param"
+		url="https://api.weixin.qq.com/cgi-bin/token?1=1"></req>
+		
+	<!-- 获取jsapi_ticket -->
+	<req key="jsapi_ticket" method="get" datatype="param"
+		url="https://api.weixin.qq.com/cgi-bin/ticket/getticket?"></req>
+
+	<!-- 微信登陆 -->
+	<req key="weChatLogin_getUserInfo" method="get" datatype="param"
+		url="https://api.weixin.qq.com/sns/userinfo?1=1"></req>
+	<req key="weChatLogin_getCodeAndState" method="get" datatype="param"
+		url="https://open.weixin.qq.com/connect/oauth2/authorize?"></req>
+	<req key="weChatLogin_getAccessToken" method="get" datatype="param"
+		url="https://api.weixin.qq.com/sns/oauth2/access_token?"></req>
+</wx-req>

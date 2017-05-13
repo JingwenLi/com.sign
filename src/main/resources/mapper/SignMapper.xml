@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sign.mapper.SignMapper">
+
+	<resultMap id="signResultMap" type="SignDetail">
+		<id property="id" column="id" />
+  		<result property="title" column="signName"/>
+  		<result property="publishTime" column="publishTime"/>
+  		<result property="effectiveTime" column="effectiveTime"/>
+  		<result property="locationRange" column="locationRange"/>
+	</resultMap>
+	
+	<resultMap type="SignInfo" id="signInfoMap">
+        <id column="signInfoId" property="id" />
+        <result column="infoName" property="name" />
+        <result column="flag" property="flag" />
+        <result column="value" property="value" />
+        <result column="countInfo" property="countInfo" />     
+    </resultMap>
+		
+    <resultMap type="SignDetail" id="getSign">
+        <id column="signId" property="id" />
+        <result column="signName" property="name" />
+        <result column="publishTime" property="publishTime" />
+        <result column="effectiveTime" property="effectiveTime" />
+        <result column="signTime" property="signTime" />
+        <result column="locationRange" property="locationRange" />
+        <result column="userId" property="userId" />
+        <collection property="signInfos" resultMap="signInfoMap" />     
+    </resultMap>
+    
+    <resultMap type="SignDetail" id="getSignUser">
+        <result column="signName" property="name" />
+        <result column="publishTime" property="publishTime" />
+        <result column="effectiveTime" property="effectiveTime" />
+        <result column="signTime" property="signTime" />
+        <result column="locationRange" property="locationRange" />
+        <result column="userId" property="userId" />
+        <result column="userName" property="userName" />     
+        <collection property="signInfos" resultMap="signInfoMap" />     
+    </resultMap>
+
+	<insert id="publishSign">
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+   			Select MAX(id) FROM sign
+  		</selectKey>
+		INSERT INTO sign (
+			userId,
+			name,
+			publishTime,
+			effectiveTime,
+			locationRange
+		) SELECT
+			#{userId}, #{name}, now(), #{effectiveTime},#{locationRange} 
+	</insert>
+	
+	<insert id="submitSign">
+		INSERT INTO sign_value (
+			longitude,
+			latitude,
+			signTime,
+			userId,
+			signId
+		) SELECT
+			#{longitude}, #{latitude}, now(), #{userId}, #{id} 
+	</insert>
+				
+	<insert id="setSignInfo"> 
+		INSERT INTO sign_info(
+			 signId, 
+			 name,
+			 flag
+		) values 		
+		<foreach item="signInfo" collection="signInfos" separator=","> 
+			(#{id},#{signInfo.name},#{signInfo.flag})
+		</foreach> 
+	</insert>
+	
+	<select id="getSignBySignId" resultMap="getSign">
+		SELECT
+			s.id AS signId,
+			s.effectiveTime,
+			s.locationRange,
+			s.name as signName,
+			s.publishTime,
+			si.id AS signInfoId,
+			si.flag,
+			si.`name` as infoName,
+			siv.`value`
+		FROM
+			sign AS s
+		LEFT OUTER JOIN	sign_info AS si on s.id = si.signId
+		LEFT OUTER JOIN	sign_info_value AS siv on si.id = siv.infoId
+		WHERE s.id = #{id}			
+	</select>
+	
+	<insert id="setSignInfoValue"> 
+		<foreach item="signInfo" collection="signInfos" separator=";"> 
+		INSERT INTO sign_info_value(
+		 	infoId, 
+		 	userId,
+		 	`value`
+		) SELECT	
+			si.id, #{userId}, #{signInfo.value}
+			FROM
+				sign_info si
+			LEFT OUTER JOIN sign s ON s.id = si.signId
+			WHERE
+				si.`name` = #{signInfo.name}
+			AND s.id = #{id}
+		</foreach> 
+	</insert>
+	
+	<insert id="saveMessage"> 
+		INSERT INTO sign_message(
+		 	signId, 
+		 	userId,
+		 	messageContent,
+		 	insertTime,
+		 	isRead
+		) SELECT	
+			#{signId}, #{userId}, #{messageContent}, now(), 0
+	</insert>
+	
+	<update id="readMessage"> 
+		UPDATE sign_message
+			SET isRead = 1
+			WHERE
+			id = #{id}
+	</update>
+	
+	<select id="getMessageByUserId" resultType="Message">
+		SELECT
+			sm.id,
+			sm.messageContent,
+			sm.insertTime,
+			sm.isRead
+		FROM
+			sign_message AS sm
+		WHERE
+			sm.userId = #{userId}
+		Order by insertTime desc	
+	</select>
+	
+	<select id="getSignUserInfo" resultMap="getSignUser">
+		SELECT
+			s.id AS signId,
+			su.id as userId,
+			su.nickName as userName,
+			sv.signTime,
+			si.`name` as infoName,
+			siv.`value`,
+			si.flag
+		FROM
+			sign_value AS sv
+		LEFT OUTER JOIN sign AS s ON s.id = sv.signId
+		LEFT OUTER JOIN sign_info AS si ON s.id = si.signId
+		right OUTER JOIN sign_info_value AS siv ON si.id = siv.infoId
+		LEFT OUTER JOIN sign_user su ON sv.userId = su.id
+		WHERE
+			s.id = #{id}
+		ORDER BY s.id
+	</select>
+	
+	
+	
+	<select id="getMySign" resultMap="getSign">
+		SELECT
+			s.id AS signId,
+			s.publishTime,
+			sv.signTime,
+			s.`name` AS signName,
+			si.`name` AS infoName,
+			si.flag,
+			COUNT(siv.infoId) AS countInfo
+		FROM
+			sign_info AS si
+		LEFT OUTER JOIN sign_info_value AS siv ON si.id = siv.infoId
+		LEFT OUTER JOIN sign AS s ON s.id = si.signId
+		LEFT OUTER JOIN sign_value AS sv ON s.id = sv.signId
+		LEFT OUTER JOIN sign_user AS su ON s.userId = su.id
+		AND siv.userId = su.id
+		WHERE
+			s.userId = #{userId}
+		OR siv.userId = #{userId}
+		GROUP BY
+			si.id		
+	</select>
+	
+</mapper>

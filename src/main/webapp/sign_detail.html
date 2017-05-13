@@ -1,0 +1,104 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<head>
+			<meta charset="utf-8">
+			<title>微信签到平台</title>
+			<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+			<meta name="apple-mobile-web-app-capable" content="yes">
+			<meta name="apple-mobile-web-app-status-bar-style" content="black">
+			<link rel="stylesheet" href="css/mui.min.css">
+			<script src="js/jquery-3.2.0.min.js"></script>
+			<script type="text/javascript" src="js/sign.js"></script>
+			<script src="js/mui.min.js"></script>
+			<script src="js/jsviews.min.js"></script>
+			<style type="text/css">
+				html,
+				body {
+					background-color: #efeff4;
+				}
+				
+				.table {
+					width: 100%;
+					height: 90%;
+					border-collapse: collapse;
+					border-spacing: 0;
+				}
+				
+				.fixedThead {
+					display: block;
+					width: 100%;
+					height: 10%;
+				}
+				
+				.scrollTbody {
+					display: block;
+					height: 480px;
+					overflow: scroll;
+					width: 100%;
+				}
+				
+				.table td,
+				.table th {
+					width: 200px;
+					border-bottom: none;
+					border-left: none;
+					border-right: 1px solid #CCC;
+					border-top: 1px solid #CCC;
+					padding: 2px 3px 3px 4px;
+				}
+				
+				.table tr {
+					border-left: 1px solid #CCC;
+					border-bottom: 1px solid #CCC;
+				}
+				/* thead.fixedThead tr th:last-child {
+            width: 218px;
+        } */
+			</style>
+		</head>
+
+		<body position:absolute>
+			<div id="signUsers" class="mui-content-padded">
+			</div>
+			<script id="signUsersTmpl" type="text/x-jsrender">
+				<table class="table">
+					<thead class="fixedThead">
+						<tr>
+							<th>参与者</th>
+							<th>签到时间</th>
+							<th>签到标签</th>
+							{^{for signInfos}}
+								<th>{{:name}}</th>
+							{{/for}}
+						</tr>
+					</thead>
+					<tbody class="scrollTbody">
+						<tr>
+							<td>{{:name}}</td>
+							<td>{{:signTime}}</td>
+							{^{for signInfos}}
+								{{if flag == 2}}
+							<td>{{:}}</td>
+								{{/if}}
+							{{/for}}
+							{^{for signInfos}}
+								{{if flag == 1}}
+							<td>{{:}}</td>
+								{{/if}}
+							{{/for}}
+						</tr>
+					</tbody>
+				</table>
+		</script>
+		
+			<script type="text/javascript">
+			//getSignUserInfo();
+			</script>
+
+		</body>
+
+</html>

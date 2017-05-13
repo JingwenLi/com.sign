@@ -1,0 +1,133 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>微信签到平台</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script type="text/javascript" src="js/sign.js"></script>
+		<script src="js/jquery-3.2.0.min.js"></script>
+		<script src="js/mui.min.js"></script>
+		<style>
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			
+			.title {
+				padding: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+				background-color: #fff;
+			}
+			
+			.active {
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-flex-flow: row wrap;
+				justify-content: space-between;
+				text-align: center;
+				color: #000000;
+			}
+			
+			a {
+				margin: 3px;
+				width: 35px;
+				height: 35px;
+				display: inline-block;
+				text-align: center;
+				border: 1px solid #D8BFD8;
+				border-radius: 25px;
+				background-clip: padding-box;
+				padding: 4px;
+				background-color: #D8BFD8;
+			}
+			
+			.mui-input-group .mui-input-row-small {
+				height: 30px;
+			}
+			
+			.ellipse {
+				background-color: #D8BFD8;
+				border-radius: 2em;
+				text-align: center;
+				white-space: nowrap;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div style="position:absolute;height:100%;overflow-y:scroll">
+			<div class="mui-content-padded" style="text-align:center">
+				<h3 id="QRcodeNote">请填写以下信息</h3>
+				<img id="QRcode" src="" width="300px" style="vertical-align:middle">
+			</div>
+
+			<div class="mui-content-padded">
+				<ul class="mui-table-view">
+					<form class="mui-input-group" id="mainForm">
+						<div class="mui-input-row">
+							<label>名称：</label> <input id="info_name" type="text" class="mui-input-clear sign_values" placeholder="">
+						</div>
+						<div class="mui-input-row">
+							<label>距离范围：</label> <input id="info_locationRange" type="text" class="mui-input-clear sign_values" placeholder="单位（米）">
+						</div>
+						<div class="mui-input-row">
+							<label>有效时间：</label> <input id="info_effectineTime" type="text" class="mui-input-clear sign_values" placeholder="单位（分钟）">
+						</div>
+					</form>
+				</ul>
+			</div>
+
+			<div class="mui-content-padded">
+				<ul class="mui-table-view">
+					<form class="mui-input-group">
+						<div class="mui-input-row">
+							<label style="width: 89%">签到标签(对用户进行分类)</label>
+							<a id="addBtn1" class="active" onclick="addItemForPublish('tags')"> <span class="mui-icon mui-icon-plusempty">
+					</span></a>
+						</div>
+					</form>
+				</ul>
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-input-row" id="tags">
+				</div>
+			</div>
+
+			<div class="mui-content-padded">
+				<ul class="mui-table-view">
+					<form class="mui-input-group">
+						<div class="mui-input-row">
+							<label style="width: 89%">签到详情(您需要签到者提供的信息)</label>
+							<a id="addBtn2" class="active" onclick="addItemForPublish('userInfos')"> <span class="mui-icon mui-icon-plusempty">
+					</span></a>
+						</div>
+					</form>
+				</ul>
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-input-row" id="userInfos">
+				</div>
+			</div>
+
+			<div class="mui-button-row">
+				<button id="confirm" type="button" class="mui-btn mui-btn-primary" onclick="sign_publish()">确认</button>
+				<button id="cancel" type="button" class="mui-btn mui-btn-danger" onclick="return false;">取消</button>
+			</div>
+
+		</div>
+
+		<script type="text/javascript">
+			mui.init();
+		</script>
+	</body>
+
+</html>

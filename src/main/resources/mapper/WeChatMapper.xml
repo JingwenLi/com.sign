@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sign.mapper.WeChatMapper">
+
+	<select id="getWeChatParamOfAccessToken" resultType="com.sign.po.AccessTokenParam">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		sys_setting.`value` AS appid
+		FROM
+		sys_setting
+		WHERE
+		sys_setting.`name` = 'AppID'
+		) AS A,
+		(
+		SELECT
+		sys_setting.`value` AS secret
+		FROM
+		sys_setting
+		WHERE
+		sys_setting.`name` = 'AppSecret'
+		) AS B
+	</select>
+
+	<select id="getUserIdByOpenId" resultType="String">
+		SELECT
+		id
+		FROM
+		sign_user
+		WHERE
+		sign_user.openid = #{openid}
+	</select>
+
+	<insert id="saveOrUpdateWeChatUser" useGeneratedKeys="true"
+		keyProperty="id">
+		<selectKey keyProperty="count" resultType="int" order="BEFORE">
+			SELECT
+			count(1)
+			FROM
+			sign_user
+			WHERE
+			sign_user.openid = #{openid}
+		</selectKey>
+		<if test="count > 0">
+			UPDATE sign_user
+			SET sign_user.lastLoginTime = now()
+			WHERE
+			sign_user.openid = #{openid}
+		</if>
+		<if test="count == 0">
+			INSERT INTO sign_user (
+			id,
+			openid,
+			nickname,
+			sex,
+			province,
+			city,
+			country,
+			headimgurl,
+			unionid,
+			insertTime
+			)
+			SELECT #{id}, #{openid}, #{nickname}, #{sex}, #{province}, #{city},
+			#{country}, #{headimgurl}, #{unionid}, now()
+		</if>
+	</insert>
+</mapper>

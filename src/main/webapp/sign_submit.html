@@ -1,0 +1,167 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>微信签到平台</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script src="js/jquery-3.2.0.min.js"></script>
+		<script type="text/javascript" src="js/sign.js"></script>
+		<script src="js/mui.min.js"></script>
+		<style>
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			
+			.title {
+				padding: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+				background-color: #fff;
+			}
+			
+			.ellipse_unchoosed {
+				padding:8px 8px;
+				background-color:#D8BFD8;
+				border-radius:2em;
+				text-align:center; 
+				white-space:nowrap;				
+			}
+			
+			.ellipse_choosed{
+				padding:8px 8px;
+				background-color:#D8BFD8;
+				border-radius:2em;
+				text-align:center; 
+				white-space:nowrap;	
+				border: #000000 2px solid;
+			}
+		</style>
+	</head>
+	
+	<div class="mui-content-padded">
+		<div id="tabbar-home" class="mui-control-content mui-active">
+			<div id="map" class="mui-card" style="width: 95%; height: 200px;">
+			</div>
+		</div>
+	</div>
+	
+	<div class="mui-content-padded">
+		<div id="signTags" style="text-align: center;">
+		</div>
+	</div>
+
+	<body>
+		<div class="mui-content-padded">
+			<ul class="mui-table-view">
+				<form class="mui-input-group">
+					<div class="mui-input-row">
+						<label style="width:50%">名称：</label> <label id="sign_name"> </label>
+					</div>
+					<div class="mui-input-row">
+						<label style="width:50%">倒计时：</label> <label id="sign_time"></label>
+					</div>
+				</form>
+				<form class="mui-input-group" id="submitForm">
+				</form>
+			</ul>
+		</div>
+				
+		<div class="mui-button-row">
+			<button type="button" class="mui-btn mui-btn-primary" onclick="sign_submit(signId)">提交</button>
+			<button type="button" class="mui-btn mui-btn-danger" onclick="return false;">取消</button>
+		</div>
+
+		<script type="text/javascript">
+			//signId
+			var signId = ${result}[0].id;
+			
+			//设置控件默认文字
+			document.getElementById("sign_name").innerHTML = ${result}[0].name;
+			
+			//加载地图
+			var map = new BMap.Map("map");
+			window.addEventListener('load', lodeMapSupport, true);
+			
+			//绑定时间刷新时间
+			var flag = window.setInterval("flushDate()", 1000);
+			
+			//动态添加控件（标签和预设输入）
+			addItemForSubmit();
+			
+			function flushDate() {
+				//倒计时自动刷新时间
+				var currentTime = new Date().getTime();
+				var date = new Date(${result}[0].publishTime);
+				var countDown = date.getTime()+ ${result}[0].effectiveTime * 60 * 1000 - currentTime;
+				if(countDown < 0) {
+					//签到过期
+					mui.alert("对不起，该签到已过期");
+					window.clearInterval(flag, 1000);
+				} else {
+					//签到未过期
+					var day = Math.floor(countDown / 1000 / 60 / 60 / 24);
+					var hour = Math.floor(countDown / 1000 / 60 / 60 % 24);
+					var minute = Math.floor(countDown / 1000 / 60 % 60);
+					var second = Math.floor(countDown / 1000 % 60);
+					var str = pad(day,2) + ":" + pad(hour,2) + ":" + pad(minute,2) + ":" + pad(second,2);
+					document.getElementById("sign_time").innerHTML = str;
+				}
+			}
+
+			function addItemForSubmit() 
+			{
+				for(var i = 0 ; i < ${result}[0].signInfos.length ; i++)
+				{				
+					//add tags
+					if(${result}[0].signInfos[i].flag == 2)
+					{
+	 					//add label to div
+						var div = document.getElementById("signTags");
+						var newLable = document.createElement("label");
+						newLable.innerHTML = ${result}[0].signInfos[i].name;
+						newLable.className = "ellipse_unchoosed";
+						newLable.tag = false;
+						
+						//设置label自适应宽度
+						var width = 30 * newLable.innerHTML.length / window.innerWidth * 100;
+						newLable.style.width = width + "%";
+						
+						//设置label的选中事件的样式
+						newLable.addEventListener("tap", function() {
+							this.tag = !this.tag;
+							this.className = this.tag?"ellipse_choosed":"ellipse_unchoosed";
+						});
+						div.appendChild(newLable);
+					} 				
+					else{
+							//add defines
+	 						//add label, input to div,to form 
+	 						var form = document.getElementById("submitForm");
+	 						var newDiv = document.createElement("div");
+	 						var newLable = document.createElement("label");
+	 						var newInput = document.createElement("input");
+	 						newDiv.className = "mui-input-row";
+	 						newLable.innerHTML = ${result}[0].signInfos[i].name + "：";
+	 						newLable.style = "width:50%";
+	 						newLable.className = "defines";
+	 						newInput.className = "mui-input-clear";
+	 						newInput.name = "defines_value";
+	 						newInput.style ="padding:11px 15px;width:50%";
+	 						newInput.type = "text";
+	 						newInput.placeholder = "请输入";					
+	 						newDiv.appendChild(newLable);
+	 						newDiv.appendChild(newInput);
+	 						form.appendChild(newDiv);
+						} 
+					}							
+				}	
+		</script>
+	</body>
+
+</html>

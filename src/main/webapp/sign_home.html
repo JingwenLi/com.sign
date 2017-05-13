@@ -1,0 +1,61 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>微信签到平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="stylesheet" href="css/mui.min.css">
+<script src="js/jweixin-1.0.0.js"></script>
+<script type="text/javascript" src="js/sign.js"></script>
+<script src="js/mui.min.js"></script>
+<script src="js/jquery-3.2.0.min.js"></script>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/api?v=2.0&ak=8827ee39511568ac0705d037d67b2624"></script>
+<script type="text/javascript"
+	src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+<style>
+html,body {
+	background-color: #efeff4;
+}
+
+.title {
+	padding: 20px 15px 10px;
+	color: #6d6d72;
+	font-size: 15px;
+	background-color: #fff;
+}
+</style>
+</head>
+
+<body>
+	<div class="mui-content-padded">
+		<div id="tabbar-home" class="mui-control-content mui-active">
+			<div id="map" class="mui-card" style="width: 95%; height: 350px;">
+			</div>
+			<div class="mui-content-padded">
+				<button id="btnPublishSign" type="button"
+					class="mui-btn mui-btn-royal mui-btn-block">发布签到</button>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+			mui.init({
+				swipeBack: true
+			});
+
+			var map = new BMap.Map("map");
+			$("#btnPublishSign").on("tap", function() {
+				window.parent.changeTag('sign_publish.html', '发布签到');
+			});
+
+			conventLocation();
+	
+	</script>
+</body>
+
+</html>
